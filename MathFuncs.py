@@ -1,12 +1,6 @@
 from __future__ import annotations
 import math
 
-def lerp(start, goal, alpha: float):
-    if type(start) != type(goal):
-        RuntimeError("start and goal are nonequivalent types")
-    else:
-        pass
-
 class Vector3D(object):
     def __init__(self, vX: float, vY: float, vZ: float):
         self._x = vX
@@ -26,10 +20,9 @@ class Vector3D(object):
             for CoordIndex in range(0, 3):
                 new_multiplied_coordinates.append(self.coordinates[CoordIndex] * multiplier)
             
-            self.coordinates = new_multiplied_coordinates
-            print(self.coordinates)
+            return Vector3D(*new_multiplied_coordinates)
         elif type(multiplier) == Vector3D: # vectors
-            self.coordinates = [self.x * multiplier.x, self.y * multiplier.y, self.z * multiplier.z]
+            return Vector3D(*[self.x * multiplier.x, self.y * multiplier.y, self.z * multiplier.z])
         else:
             RuntimeError("invalid multiplier, got: " + str(type(multiplier)))
 
@@ -41,25 +34,40 @@ class Vector3D(object):
             for CoordIndex in range(0, 3):
                 new_divided_coordinates.append(self.coordinates[CoordIndex] / divisor)
 
-            self.coordinates = new_divided_coordinates
+            return Vector3D(*new_divided_coordinates)
         elif type(divisor) == Vector3D: # vectors
-            self.coordinates = [self.x / divisor.x, self.y / divisor.y, self.z / divisor.z]
+            return Vector3D(*[self.x / divisor.x, self.y / divisor.y, self.z / divisor.z])
         else:
             RuntimeError("invalid divisor type, got: " + str(type(divisor)))
     
     def add(self, vector: Vector3D):
+        added_coordinates = []
+
         for coord in range(len(self.coordinates)):
-            self.coordinates[coord] += vector.coordinates[coord]
+            added_coordinates.append(self.coordinates[coord] + vector.coordinates[coord])
+        
+        return Vector3D(*added_coordinates)
 
     def subtract(self, vector: Vector3D):
+        subtracted_coordinates = []
+
         for coord in range(len(self.coordinates)):
-            self.coordinates[coord] -= vector.coordinates[coord]
+            subtracted_coordinates.append(self.coordinates[coord] - vector.coordinates[coord])
+       
+        return Vector3D(*subtracted_coordinates)
     
     def dot(self, vector: Vector3D):
-        return 
+        return (self.x * vector.x) + (self.y * vector.y) + (self.z * vector.z)
 
     def cross(self, vector: Vector3D):
-        pass
+        return Vector3D(
+            (self.y * vector.z) - (self.z * vector.y),
+            (self.z * vector.x) - (self.x * vector.z),
+            (self.x * vector.y) - (self.y * vector.x)
+        )
+
+    def lerp(self, vector: Vector3D, alpha: int | float):
+        return self.add((vector.subtract(self)).multiply(alpha))
 
     @property
     def coordinates(self):
@@ -90,7 +98,11 @@ class Vector3D(object):
     
     @property
     def unit(self):
-        return [self.y / self.magnitude, self.y / self.magnitude, self.z / self.magnitude]
+        return Vector3D(
+            self.x / self.magnitude, 
+            self.y / self.magnitude, 
+            self.z / self.magnitude
+        )
     
 
 class Vector2D:
@@ -151,32 +163,70 @@ class Matrix2D:
     def matrix_multiply():
         pass
 
+# VECTORS
+inputed_vectors = {
+    "vectorA": None,
+    "vectorB": None
+}
 
-def round(number: float, index: int):
-    pass
+for vector_name, _3D_vector in inputed_vectors.items():
+    # while True:
+    new_vector_input = input("input the coordinates for " + vector_name + ": ")
+    new_vector_list = new_vector_input.split()
 
-def dot(vector_1, vector_2):
-    if type(vector_1) != type(vector_2): 
-        RuntimeError("attempt to get dot product of nonequivalent types")
-    
-    return (vector_1.magnitude * vector_2.magnitude) / math.cos()
+    for vector_index in range(len(new_vector_list)):
+        vector_value = new_vector_list[vector_index]
 
-def cross(vector_1, vector_2):
-    pass
+        try:
+            if vector_value.find(".") != -1:
+                new_vector_list[vector_index] = float(vector_value)
+            else:
+                new_vector_list[vector_index] = int(vector_value)
+        except:
+            print("Coordinate is not a number")
+        
+        inputed_vectors[vector_name] = new_vector_list
 
-arbitrary_vector1 = Vector3D(1, -3, 2)
-arbitrary_vector2 = Vector3D(3, 2, 1)
+        if vector_index == 2 and vector_name == "vectorB":
+            break
 
-print(arbitrary_vector1.coordinates)
-arbitrary_vector1.divide(arbitrary_vector2)
-print(arbitrary_vector1.coordinates)
+arbitrary_vectorA = Vector3D(
+    inputed_vectors["vectorA"][0],
+    inputed_vectors["vectorA"][1],
+    inputed_vectors["vectorA"][2]
+)
 
-# UNIT VECTOR
+arbitrary_vectorB = Vector3D(
+    inputed_vectors["vectorB"][0],
+    inputed_vectors["vectorB"][1],
+    inputed_vectors["vectorB"][2]
+)
 
-print(math.sqrt(arbitrary_vector1.unit))
+'''
+Vector A: <-2, 3 0>
+Vector B: <1, 4, 2>
+'''
+
+# UNIT VECTORS
+arbitrary_vectorA_unit = arbitrary_vectorA.unit
+arbitrary_vectorB_unit = arbitrary_vectorB.unit
+
+# LENGTHS
+print("LENGTH OF A: " + str(arbitrary_vectorA.magnitude) + " - COORDINATES " + str(arbitrary_vectorA.coordinates))
+print("LENGTH OF B: " + str(arbitrary_vectorA.magnitude) + " - COORDINATES " + str(arbitrary_vectorB.coordinates))
+print("LENGTH OF UNIT A: " + str(arbitrary_vectorA_unit.magnitude) + " - COORDINATES " + str(arbitrary_vectorA_unit.coordinates))
+print("LENGTH OF UNIT B: " + str(arbitrary_vectorA_unit.magnitude) + " - COORDINATES " + str(arbitrary_vectorB_unit.coordinates))
 
 # DOT PRODUCT
-""""
-dot_product = arbitrary_vector1.dot(arbitrary_vector2)
-print(dot_product)
-"""
+dot_product = arbitrary_vectorA.dot(arbitrary_vectorB)
+unit_dot_product = arbitrary_vectorA_unit.dot(arbitrary_vectorB_unit)
+print("DOT PRODUCT OF A AND B: " + str(dot_product))
+print("UNIT DOT PRODUCT OF A AND B: " + str(unit_dot_product))
+
+#CROSS PRODUCT
+
+print("CROSS PRODUCT OF A AND B: " + str(arbitrary_vectorA.cross(arbitrary_vectorB).coordinates))
+
+#LERP
+print("VECTOR OF A TO B AT 25%: " + str(arbitrary_vectorA.lerp(arbitrary_vectorB, .25).coordinates))
+print("VECTOR OF A TO B AT 50%: " + str(arbitrary_vectorA.lerp(arbitrary_vectorB, .5).coordinates))
