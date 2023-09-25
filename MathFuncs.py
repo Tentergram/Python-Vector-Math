@@ -7,20 +7,27 @@ def lerp(start, goal, alpha: float):
     else:
         pass
 
-class Vector3D:
+class Vector3D(object):
     def __init__(self, vX: float, vY: float, vZ: float):
         self._x = vX
         self._y = vY
         self._z = vZ
 
         self._magnitude = math.sqrt((math.pow(self.x, 2) + math.pow(self.y, 2) + math.pow(self.z, 2)))
+        self._unit = [self.x / self.magnitude, self.y / self.magnitude, self.z / self.magnitude]
 
-        self.coordinates = [self.x, self.y, self.z]
+        self.coordinates = [self._x, self._y, self._z]
+
     
     def multiply(self, multiplier: float | int | Vector3D):
         if type(multiplier) == float or type(multiplier) == int: # scalars
+            new_multiplied_coordinates = []
+
             for CoordIndex in range(0, 3):
-                self.coordinates[CoordIndex] *= multiplier
+                new_multiplied_coordinates.append(self.coordinates[CoordIndex] * multiplier)
+            
+            self.coordinates = new_multiplied_coordinates
+            print(self.coordinates)
         elif type(multiplier) == Vector3D: # vectors
             self.coordinates = [self.x * multiplier.x, self.y * multiplier.y, self.z * multiplier.z]
         else:
@@ -28,9 +35,13 @@ class Vector3D:
 
 
     def divide(self, divisor: int | float | Vector3D):
-        if type(divisor) == 'float' or type(divisor) == 'int': # scalars
+        if type(divisor) == float or type(divisor) == int: # scalars
+            new_divided_coordinates = []
+            
             for CoordIndex in range(0, 3):
-                self.coordinates[CoordIndex] /= divisor
+                new_divided_coordinates.append(self.coordinates[CoordIndex] / divisor)
+
+            self.coordinates = new_divided_coordinates
         elif type(divisor) == Vector3D: # vectors
             self.coordinates = [self.x / divisor.x, self.y / divisor.y, self.z / divisor.z]
         else:
@@ -45,11 +56,22 @@ class Vector3D:
             self.coordinates[coord] -= vector.coordinates[coord]
     
     def dot(self, vector: Vector3D):
-        pass
+        return 
 
     def cross(self, vector: Vector3D):
         pass
 
+    @property
+    def coordinates(self):
+        return self._coordinates
+    @coordinates.setter
+    def coordinates(self, value):
+        self._x = value[0]
+        self._y = value[1]
+        self._z = value[2]
+
+        self._coordinates = value
+    
     @property
     def x(self):
         return self._x
@@ -60,11 +82,15 @@ class Vector3D:
     
     @property
     def z(self):
-        return self.coordinates[2]
+        return self._z
 
     @property
     def magnitude(self):
         return math.sqrt((math.pow(self.x, 2) + math.pow(self.y, 2) + math.pow(self.z, 2)))
+    
+    @property
+    def unit(self):
+        return [self.y / self.magnitude, self.y / self.magnitude, self.z / self.magnitude]
     
 
 class Vector2D:
@@ -101,9 +127,9 @@ class Vector2D:
 class Matrix3D:
     def __init__(self):
         self.MatrixCoordinates = {
-            "Roll": {"x": 1, "y": 0, "z": 0},
-            "Pitch": {"x": 0, "y": 1, "z": 0},
-            "Yaw": {"x": 0, "y": 0, "z": 1}
+            {"x": 1, "y": 0, "z": 0},
+            {"x": 0, "y": 1, "z": 0},
+            {"x": 0, "y": 0, "z": 1}
         }
     
     def scalar_multiply():
@@ -115,8 +141,8 @@ class Matrix3D:
 class Matrix2D:
     def __init__(self):
         self.MatrixCoordinates = {
-            "AxisX": {"x": 1, "y": 0},
-            "AxisY": {"x": 0, "y": 1}
+            {"x": 1, "y": 0},
+            {"x": 0, "y": 1}
         }
     
     def scalar_multiply():
@@ -141,6 +167,16 @@ def cross(vector_1, vector_2):
 arbitrary_vector1 = Vector3D(1, -3, 2)
 arbitrary_vector2 = Vector3D(3, 2, 1)
 
-print(arbitrary_vector1.magnitude)
-arbitrary_vector1.multiply(2)
-print(arbitrary_vector1.magnitude)
+print(arbitrary_vector1.coordinates)
+arbitrary_vector1.divide(arbitrary_vector2)
+print(arbitrary_vector1.coordinates)
+
+# UNIT VECTOR
+
+print(math.sqrt(arbitrary_vector1.unit))
+
+# DOT PRODUCT
+""""
+dot_product = arbitrary_vector1.dot(arbitrary_vector2)
+print(dot_product)
+"""
